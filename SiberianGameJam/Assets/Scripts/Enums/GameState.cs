@@ -3,5 +3,6 @@
     Moving,
     EnemyAttack,
     PlayerAttack,
-    Wait
+    Wait,
+    Dead
 }

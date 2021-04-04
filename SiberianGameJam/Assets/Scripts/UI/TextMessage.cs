@@ -18,7 +18,7 @@ public class TextMessage : MonoBehaviour
         _text = GetComponent<Text>();
         _text.text = text;
         gameObject.GetComponent<RectTransform>().position = Camera.main.WorldToScreenPoint(pos);
-        gameObject.GetComponent<RectTransform>().DOAnchorPosY(40, _duration, true);
+        gameObject.GetComponent<RectTransform>().DOAnchorPosY(100, _duration, true);
         _text.DOColor(Color.clear, _duration);
     }
 

@@ -7,20 +7,28 @@ public class Player : MonoBehaviour
 {
     [SerializeField] protected float _speed;
     [SerializeField] protected float _distanceForStay;
-    [SerializeField] protected bool _direction;
+    [SerializeField] bool _direction;
+    [SerializeField] private Sprite _sprite;
+    [SerializeField] private EnemyController enemyController;
+    [SerializeField] private GameController gameController;
+    [SerializeField] UI _uI;
 
     public bool _ControllerIsBlocked;
     private Vector3 _currentMousePosition;
     private System.Random _random;
     protected Rigidbody2D _rigidbody { get; set; }
     public PlayerState PlayerState { get; set; }
-    private GameState _gameState;
+    public Sprite GetSptite { get { return _sprite; } }
+    public bool Direction { get { return _direction; } }
+    public GameState _gameState;
     public int _maxHP = 100;
     public int _currentHP;
     public int _baseDamage = 10;
+    public Animator animator;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
         _random = new System.Random();
         _currentHP = _maxHP;
         _gameState = GameState.Moving;
@@ -36,7 +44,7 @@ public class Player : MonoBehaviour
             case GameState.Moving:
                 if (Input.GetMouseButtonDown(0))
                 {
-                    _currentMousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 90));
+                    _currentMousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 78));
 
                     if (CheckDistance())
                     {
@@ -54,13 +62,18 @@ public class Player : MonoBehaviour
                 }
                 break;
             case GameState.EnemyAttack:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
                 break;
             case GameState.PlayerAttack:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
                 break;
             case GameState.Wait:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
+                break;
+            case GameState.Dead:
                 break;
         }
     }
@@ -73,13 +86,18 @@ public class Player : MonoBehaviour
                 Move();
                 break;
             case GameState.EnemyAttack:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
                 break;
             case GameState.PlayerAttack:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
                 break;
             case GameState.Wait:
+                PlayerState = PlayerState.Stay;
                 DontControlled();
+                break;
+            case GameState.Dead:
                 break;
         }
     }
@@ -101,6 +119,8 @@ public class Player : MonoBehaviour
 
     public void Move()
     {
+        animator.SetFloat("IsMoving", Math.Abs(_rigidbody.velocity.x));
+
         switch (PlayerState)
         {
             case PlayerState.Stay:
@@ -113,11 +133,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    public int CountDamage(float _probality)
+    public int CountDamage(float _probality, float addPr, int addDamage)
     {
-        if (_probality > _random.Next(0, 100))
+        if (_probality + addPr > _random.Next(0, 100))
         {
-            return _baseDamage + _random.Next(0, 10);
+            return _baseDamage + _random.Next(0, 10) + addDamage;
         }
         else
         {
@@ -178,8 +198,40 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void AddHP(int hp)
+    {
+        _currentHP += hp;
+
+        if (_currentHP > _maxHP)
+        {
+            _currentHP = _maxHP;
+        }
+    }
+
+    public void SetDamage(int damage)
+    {
+        _currentHP -= damage;
+
+        if (_currentHP <= 0)
+        {
+            _uI.deadPanel.gameObject.SetActive(true);
+        }
+    }
+
     public void SetGamesState(GameState gameState)
     {
         _gameState = gameState;
+    }
+
+    public void Hot()
+    {
+        enemyController.Hit();
+    }
+
+    public void EndHit()
+    {
+        //gameController.SetGamesState(GameState.EnemyAttack);
+        enemyController.Enemy.animator.SetTrigger("Hit");
+        animator.SetTrigger("IsHit");
     }
 }

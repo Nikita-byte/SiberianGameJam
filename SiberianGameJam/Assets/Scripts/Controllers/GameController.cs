@@ -13,17 +13,27 @@ public class GameController : MonoBehaviour
     [SerializeField] private Transform _rightSpawnPos;
     [SerializeField] private bool _isRightStairs = false;
     [SerializeField] private EnemyController _enemyController;
+    [SerializeField] private CardController _cardController;
     [SerializeField] private UI _ui;
+    [SerializeField] private GameObject BackGround;
 
+    public AudioSource audioSource;
+    private Camera _camera;
     private Transform[] _floorsPos;
     private int _maxFloorsOnScene = 5;
     private System.Random _rand;
     private GameState _gameState;
+    public Player Player { get { return _player; } }
 
     private GameObject[] _activeFloors;
 
     private void Start()
     {
+        _ui.deadPanel.gameObject.SetActive(false);
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
+        DOTween.SetTweensCapacity(5000, 50);
+        _camera = Camera.main;
         _rand = new System.Random();
         ObjectPool.Pool.Initialize();
         _gameState = GameState.Moving;
@@ -68,6 +78,7 @@ public class GameController : MonoBehaviour
         _gameState = gameState;
         _enemyController.SetGamesState(_gameState);
         _player.SetGamesState(_gameState);
+        _cardController.SetGameState(_gameState);
     }
 
     public void CreatePlatforms()
@@ -113,6 +124,7 @@ public class GameController : MonoBehaviour
             }
         }
 
+        BackGround.transform.DOMove(BackGround.transform.position - Vector3.up * 25, _movePlatformDuration);
         _activeFloors[2].GetComponent<Floor>().ActivateRoom(true);
         //_activeFloors[0].GetComponent<Floor>().OffEnemy();
         //_activeFloors[1].GetComponent<Floor>().OffEnemy();
@@ -125,6 +137,11 @@ public class GameController : MonoBehaviour
 
         _activeFloors[_maxFloorsOnScene - 1].transform.position = _floorsPos[_maxFloorsOnScene - 1].position;
         _activeFloors[_maxFloorsOnScene - 1].SetActive(true);
+
+        if (_cardController.ActiveCard != null)
+        {
+            _ui.SwitchSideCard();
+        }
     }
 
     private void SwitchStairsSide()
@@ -137,5 +154,11 @@ public class GameController : MonoBehaviour
         {
             _isRightStairs = true;
         }
+    }
+
+    public void ShakeCamera()
+    {
+        Tweener tweener = DOTween.Shake(() => _camera.transform.position, pos => _camera.transform.position = pos,
+                0.5f, 1, 15, 90, false);
     }
 }

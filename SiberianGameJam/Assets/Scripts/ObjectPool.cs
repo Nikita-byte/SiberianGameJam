@@ -13,7 +13,8 @@ public sealed class ObjectPool
     private string FLOORS = "[Floors]";
     private List<GameObject> _floors;
     private List<GameObject> _enemies;
-    private int _floorsCountInPool = 10;
+    public Dictionary<string, Sprite> _cardSprites = new Dictionary<string, Sprite>();
+    private int _floorsCountInPool = 3;
     private int _enemiesCountInPool = 10;
     private GameObject _pool;
     private GameObject _floorsPool;
@@ -25,6 +26,16 @@ public sealed class ObjectPool
     private EnemyController _enemyController;
 
     public static ObjectPool Pool { get { return _instance; } }
+
+    public ObjectPool()
+    {
+        var cards = Resources.LoadAll<Sprite>("Cards");
+
+        foreach (Sprite card in cards)
+        {
+            _cardSprites.Add(card.name, card);
+        }
+    }
 
     public void Initialize()
     {
@@ -67,6 +78,7 @@ public sealed class ObjectPool
         }
 
         _enemyController.InitializeEnemies( ref _enemies);
+       
     }
 
     public GameObject GetFloor()

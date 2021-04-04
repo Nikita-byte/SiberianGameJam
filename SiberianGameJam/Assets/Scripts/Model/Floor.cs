@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using DG.Tweening;
 
 
 public class Floor : MonoBehaviour
@@ -17,7 +18,8 @@ public class Floor : MonoBehaviour
 
     public void ActivateRoom(bool isActive)
     {
-        _blackPanel.SetActive(false);
+        _blackPanel.GetComponent<SpriteRenderer>().DOColor(Color.clear,2);
+        //_blackPanel.SetActive(false);
 
         if (_enemy != null)
         {
@@ -71,7 +73,8 @@ public class Floor : MonoBehaviour
             _enemy = null;
         }
 
-        _blackPanel.SetActive(true);
+        _blackPanel.GetComponent<SpriteRenderer>().color = Color.black;
+        //_blackPanel.SetActive(true);
         ObjectPool.Pool.ReturnFloorInPool(gameObject);
     }
 }

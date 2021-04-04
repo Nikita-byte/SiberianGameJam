@@ -4,20 +4,54 @@ using DG.Tweening;
 using UnityEngine.EventSystems;
 
 
-public class CardsUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class CardsUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public void OnPointerClick(PointerEventData eventData)
+    [SerializeField] private RectTransform _toPosition;
+    [SerializeField] private RectTransform _OfPos;
+    [SerializeField] private UI _ui;
+
+    public AudioSource audioSource;
+    public string _discription;
+    private float _duration = 0.5f;
+    private Vector2 _position;
+    public bool IsActive;
+
+    private void Start()
     {
-        throw new System.NotImplementedException();
+        audioSource = GetComponent<AudioSource>();
+        _position = gameObject.GetComponent<RectTransform>().anchoredPosition;
+        IsActive = true;
+    }
+
+    public void OffCard()
+    {
+        gameObject.GetComponent<RectTransform>().DOAnchorPos(_OfPos.anchoredPosition, _duration);
+        IsActive = false;
+    }
+
+    public void RefreshCard()
+    {
+        gameObject.GetComponent<RectTransform>().DOAnchorPos(_position, _duration);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        transform.DOMove(Vector3.forward, 5);
+        _ui.Discription.text = _discription;
+        audioSource.Play();
+
+        if (IsActive)
+        {
+            gameObject.GetComponent<RectTransform>().DOAnchorPos(_toPosition.anchoredPosition, _duration);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        _ui.Discription.text = "";
+
+        if (IsActive)
+        {
+            gameObject.GetComponent<RectTransform>().DOAnchorPos(_position, _duration);
+        }
     }
 }
