@@ -2553,7 +2553,7 @@ MonoBehaviour:
   _countHP: 3
   _countHP2: 3
   _countKing: 1
-  _countOctosmash: 90
+  _countOctosmash: 3
   _countOctosmash2: 2
   _countOctosmash3: 2
   _countRandom: 2
